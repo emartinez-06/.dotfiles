@@ -1,0 +1,18 @@
+cat > ~/.config/.gitignore << 'EOF'
+# Ignore cache and temporary files
+*/cache/
+**/cache/
+*.log
+*.swp
+*.swo
+*~
+
+# Ignore sensitive data
+**/credentials
+**/tokens
+
+# Ignore plugin directories (let users install their own)
+nvim/lazy/
+tmux/plugins/
+.DS_Store
+EOF
