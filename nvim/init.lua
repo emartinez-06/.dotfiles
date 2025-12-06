@@ -1,7 +1,5 @@
--- Suppress lspconfig deprecation warning
-vim.g.lspconfig_deprecation_warnings = false
-
 -- General settings
+vim.g.lspconfig_deprecation_warnings = false
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.hlsearch = false
@@ -20,6 +18,8 @@ vim.opt.guicursor = {
   "o:hor50",
   "a:blinkon0",
 }
+
+vim.opt.clipboard = "unnamedplus"
 
 vim.g.mapleader = " "
 vim.g.tmux_navigator_no_wrap = 1
@@ -99,6 +99,7 @@ require("lazy").setup({
   config = function()
     -- Modern way to setup LSP
     local lspconfig = require('lspconfig')
+    vim.g.deprecate_lspconfig = false  -- Suppress the warning temporarily
     
     -- Setup clangd with default settings
     lspconfig.clangd.setup({
@@ -171,7 +172,7 @@ require("lazy").setup({
     end,
   },
 
-  -- File Explorer (nvim-tree is more modern than NERDTree)
+  -- File Explorer 
   {
     'nvim-tree/nvim-tree.lua',
     dependencies = {
