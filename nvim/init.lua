@@ -10,7 +10,10 @@ vim.o.autoindent = true
 vim.opt.tabstop = 4
 vim.o.softtabstop = 4
 vim.opt.shiftwidth = 4
+-- Add current course snippets to runtime path
+vim.opt.runtimepath:append(vim.fn.expand('~/current_course'))
 vim.opt.expandtab = true
+vim.opt.scrolloff = 999
 vim.opt.guicursor = {
   "n-v-c:block",
   "i-ci-ve:ver25",
@@ -18,6 +21,16 @@ vim.opt.guicursor = {
   "o:hor50",
   "a:blinkon0",
 }
+
+-- Spell check configuration
+vim.opt.spell = true
+vim.opt.spelllang = { 'en_us' }  -- Adjust languages as needed
+
+-- Ctrl+L to fix previous spelling mistake
+-- Jumps back to previous misspelled word, picks first suggestion, jumps back
+vim.keymap.set('i', '<C-l>', '<c-g>u<Esc>[s1z=`]a<c-g>u', { 
+  desc = 'Fix previous spelling mistake' 
+})
 
 vim.opt.clipboard = "unnamedplus"
 
@@ -93,6 +106,17 @@ require("lazy").setup({
       }
     end,
   },
+-- UltiSnips for LaTeX!
+  {
+  "sirver/ultisnips",
+  lazy = false,
+  init = function()
+    vim.g.UltiSnipsExpandTrigger = "<tab>"
+    vim.g.UltiSnipsJumpForwardTrigger = "<tab>"
+    vim.g.UltiSnipsJumpBackwardTrigger = "<s-tab>"
+  end
+},
+
 -- LSP Config
 {
   'neovim/nvim-lspconfig',
@@ -143,17 +167,48 @@ require("lazy").setup({
           ['<C-Space>'] = cmp.mapping.complete(),
           ['<C-e>'] = cmp.mapping.abort(),
           ['<CR>'] = cmp.mapping.confirm({ select = true }),
-          ['<Tab>'] = cmp.mapping.select_next_item(),
-          ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+
+        -- Normal Tab autocompletion for coding files
+        ['<Tab>'] = cmp.mapping.select_next_item(),
+        ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+
         }),
         sources = cmp.config.sources({
           { name = 'nvim_lsp' },
-          { name = 'luasnip' },
         }, {
           { name = 'buffer' },
           { name = 'path' },
-        })
+        }),
       })
+
+       -------------------------------------------------------------------------
+    -- FILETYPE OVERRIDE: Disable CMP tab completion in LaTeX (.tex)
+    -------------------------------------------------------------------------
+ cmp.setup.filetype("tex", {
+  mapping = {
+    ["<Tab>"] = function(fallback)
+      if vim.fn["UltiSnips#CanExpandSnippet"]() == 1 then
+        vim.fn["UltiSnips#ExpandSnippet"]()
+      elseif vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
+        vim.fn["UltiSnips#JumpForwards"]()
+      else
+        fallback()
+      end
+    end,
+
+    ["<S-Tab>"] = function(fallback)
+      if vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
+        vim.fn["UltiSnips#JumpBackwards"]()
+      else
+        fallback()
+      end
+    end,
+  },
+
+  -- No LSP autocomplete for LaTeX unless you use texlab/ltex
+  sources = {
+  }
+})
     end,
   },
 
@@ -209,6 +264,8 @@ require("lazy").setup({
       vim.g.vimtex_view_method = 'skim'
       vim.g.vimtex_view_skim_sync = 1
       vim.g.vimtex_view_skim_activate = 1
+      vim.g.vimtex_quickfix_mode = 0
+
       vim.o.conceallevel = 1
       vim.g.tex_conceal = 'abdmg'
     end
