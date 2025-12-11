@@ -665,6 +665,13 @@ snippet enum "enumerate environment" b
 endsnippet
 
 snippet td "bold text (visual support)" w
-\\textbf{${1:${VISUAL}}}
+\\noindent\textbf{${1:${VISUAL}}}
 endsnippet
 
+snippet it "italizise text (visual support)" w
+\\textit{${1:${VISUAL}}}
+endsnippet
+
+snippet endl "Insert \\[4pt]" b
+\\[4pt]$0
+endsnippet
